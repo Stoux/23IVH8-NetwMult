@@ -1,0 +1,11 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="nl.stoux.sockettest.MainActivity" >
+
+    <!-- Search, should appear as action button -->
+    <item android:id="@+id/start_client"
+          android:icon="@drawable/ic_action_dock"
+          android:title="@string/start_client"
+          android:showAsAction="always" />
+
+</menu>

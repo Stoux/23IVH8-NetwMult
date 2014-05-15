@@ -1,0 +1,122 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/container"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="nl.stoux.sockettest.ClientActivity"
+    tools:ignore="MergeRootFrame" 
+    android:orientation="vertical"
+    >
+    
+    <!-- IP input -->
+    <LinearLayout 
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        >
+        
+        <TextView 
+            android:layout_width="0dip"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.20"
+            android:text="@string/ip_label"
+            />
+        
+        <EditText 
+            android:id="@+id/ip_input"
+            android:layout_height="wrap_content"
+            android:layout_width="0dip"
+            android:layout_weight="0.80"
+            android:hint="@string/ip_input_hint"
+            />
+        
+    </LinearLayout>
+    
+    <!-- Port input -->
+    <LinearLayout 
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        >
+        <TextView 
+            android:layout_width="0dip"
+            android:layout_weight="0.20"
+            android:layout_height="wrap_content"
+            android:text="@string/port_label"
+            />
+        
+        <EditText 
+            android:id="@+id/port_input"
+            android:layout_height="wrap_content"
+            android:layout_width="0dip"
+            android:layout_weight="0.80"
+            android:inputType="number"
+            android:hint="@string/port_input_hint"
+            />
+    </LinearLayout>
+    
+    <!-- Seperator -->
+    <View
+        android:layout_marginTop="15dp"
+        android:layout_marginBottom="15dp"
+    	android:layout_width="fill_parent"
+    	android:layout_height="1dp"
+    	android:background="@android:color/darker_gray"
+    	/>
+    
+    <!-- Capsify input -->
+    <LinearLayout 
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        >
+        <TextView 
+            android:layout_width="0dip"
+            android:layout_weight="0.20"
+            android:layout_height="wrap_content"
+            android:text="@string/caps_label"
+            />
+        
+        <EditText 
+            android:id="@+id/caps_input"
+            android:layout_height="wrap_content"
+            android:layout_width="0dip"
+            android:layout_weight="0.80"
+            android:hint="@string/caps_input_hint"
+            />
+    </LinearLayout>
+    <!-- Capsify button -->
+    <Button 
+        android:id="@+id/caps_button"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/caps_button"
+        />
+    
+    <!-- Seperator -->
+    <View
+        android:layout_marginTop="15dp"
+        android:layout_marginBottom="15dp"
+    	android:layout_width="fill_parent"
+    	android:layout_height="1dp"
+    	android:background="@android:color/darker_gray"
+    	/>
+    
+    <!-- Output -->
+    <ScrollView 
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:layout_width="match_parent"
+        android:layout_marginLeft="5dip"
+        android:layout_marginRight="5dip"
+        android:layout_marginBottom="5dip"
+        >
+        <TextView 
+            android:id="@+id/console_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            />
+    </ScrollView>
+    
+</LinearLayout>
+

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">FixedStreamingTest</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="action_settings">Settings</string>
+    
+    <!-- Main Activity Buttons -->
+    <string name="setup_button">Setup</string>
+    <string name="start_button">Start</string>
+    <string name="pause_button">Pause</string>
+    <string name="teardown_button">Teardown</string>
+    <!-- Main Activity Others -->
+    <string name="movie_stream">Movie Stream</string>
+    <string name="state_text">Status: Opstarten</string>
+    
+
+</resources>

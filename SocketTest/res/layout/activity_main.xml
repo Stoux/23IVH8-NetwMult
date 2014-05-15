@@ -1,0 +1,56 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/container"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="nl.stoux.sockettest.MainActivity"
+    tools:ignore="MergeRootFrame" 
+    android:orientation="vertical"
+    >
+    
+        <!-- Console with ScrollView -->
+    <ScrollView 
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:layout_width="match_parent"
+        android:background="@color/black"
+        >
+        <TextView 
+            android:id="@+id/console_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            />
+    </ScrollView>
+    
+    <LinearLayout 
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:weightSum="1.0"
+        android:layout_gravity="bottom"
+        >
+        
+        <Button 
+            android:id="@+id/start_button"
+            android:layout_width="0dp"
+            android:layout_weight="0.5"
+            android:layout_height="wrap_content"
+            android:textSize="12sp"
+            android:text="@string/start_button"
+            style="?android:attr/borderlessButtonStyle"
+            />
+        
+        <Button 
+            android:id="@+id/stop_button"
+            android:layout_width="0dp"
+            android:layout_weight="0.5"
+            android:layout_height="wrap_content"
+            android:textSize="12sp"
+            android:text="@string/stop_button"
+            style="?android:attr/borderlessButtonStyle"
+            />
+        
+    </LinearLayout>
+    
+</LinearLayout>
+
