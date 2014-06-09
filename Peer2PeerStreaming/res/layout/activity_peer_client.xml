@@ -1,0 +1,106 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/container"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="nl.stoux.streamingtest.MainActivity"
+    tools:ignore="MergeRootFrame"
+    android:orientation="vertical"
+    >
+    
+    <TextView 
+        android:id="@+id/filename_at_ip_text"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="File@IP:Port"
+        android:gravity="center"
+        android:layout_marginTop="5dip"
+        />
+    
+    <TextView 
+        android:id="@+id/jitter_playout_delay"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="Playout Delay: X"
+        android:gravity="center"
+        android:layout_marginTop="5dip"
+        />
+    
+    <ImageView
+        android:id="@+id/movie_stream"
+        android:layout_width="fill_parent"
+        android:layout_height="0dip"
+        android:layout_weight="1"
+        android:adjustViewBounds="true"
+        android:contentDescription="@string/movie_stream"
+        android:scaleType="centerInside"
+        android:src="@drawable/ic_action_help" />
+    
+    <TextView 
+        android:id="@+id/state_text"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="Status"
+        android:gravity="center"
+        android:layout_marginTop="5dip"
+        />
+    
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:weightSum="1"
+        >
+        
+        <ImageButton 
+            android:id="@+id/setup_button"
+            android:layout_width="0dip"
+            android:layout_weight="0.25"
+            android:layout_height="wrap_content"
+            android:contentDescription="@string/setup_button"
+            android:src="@drawable/ic_action_video"
+            style="?android:attr/buttonBarButtonStyle"
+            android:onClick="onSetupButton"
+            android:clickable="false"
+            />
+        
+		<ImageButton 
+            android:id="@+id/start_button"
+            android:layout_width="0dip"
+            android:layout_weight="0.25"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_action_play"
+            android:contentDescription="@string/start_button"
+            style="?android:attr/buttonBarButtonStyle"
+            android:onClick="onStartButton"
+            android:clickable="false"
+            />
+                
+		<ImageButton 
+            android:id="@+id/pause_button"
+            android:layout_width="0dip"
+            android:layout_weight="0.25"
+            android:layout_height="wrap_content"
+            android:contentDescription="@string/pause_button"
+            android:src="@drawable/ic_action_pause"
+            style="?android:attr/buttonBarButtonStyle"
+            android:onClick="onPauseButton"
+            android:clickable="false"
+            />
+                        
+		<ImageButton 
+            android:id="@+id/teardown_button"
+            android:layout_width="0dip"
+            android:layout_weight="0.25"
+            android:layout_height="wrap_content"
+            android:contentDescription="@string/teardown_button"
+            android:src="@drawable/ic_action_stop"
+            style="?android:attr/buttonBarButtonStyle"
+            android:onClick="onTeardownButton"
+            android:clickable="false"
+            />
+        
+    </LinearLayout>
+    
+</LinearLayout>
+

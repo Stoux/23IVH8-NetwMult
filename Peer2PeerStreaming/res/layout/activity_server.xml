@@ -1,0 +1,56 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/container"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="nl.stoux.peer2peerstreaming.ServerActivity"
+    tools:ignore="MergeRootFrame"
+    android:orientation="vertical" 
+    >
+    
+    <LinearLayout
+        android:id="@+id/server_button_container"
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:orientation="horizontal"
+        style="?android:attr/buttonBarStyle"
+        >
+        
+        <Button 
+            android:id="@+id/start_server_button" 
+            android:layout_height="wrap_content"
+            android:layout_width="0dp"
+            android:layout_weight="0.5"
+            android:text="Start"
+            style="?android:attr/buttonBarButtonStyle"
+            />
+        
+        <Button
+            android:id="@+id/stop_server_button" 
+            android:layout_height="wrap_content"
+            android:layout_width="0dp"
+            android:layout_weight="0.5"
+            android:text="Stop"
+            style="?android:attr/buttonBarButtonStyle"
+            />
+        
+    </LinearLayout>
+    
+    <TextView 
+        android:id="@+id/server_status_info"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Server status: Uit"
+        android:gravity="center"
+        />
+    
+    <ListView 
+        android:id="@+id/connected_peers_list"
+        android:layout_height="0dp"
+        android:layout_width="match_parent"
+        android:layout_weight="1"
+        />
+    
+</LinearLayout>
+    
+

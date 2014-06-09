@@ -1,0 +1,25 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="nl.stoux.peer2peerstreaming.PeerListActivity" >
+
+    <item
+        android:id="@+id/action_new_upload"
+        android:title="@+id/action_new_upload"
+        android:icon="@drawable/ic_action_upload"
+        android:showAsAction="always"
+        />
+    
+    <item
+        android:id="@+id/action_peer_refresh"
+        android:title="@+id/action_peer_refresh"
+        android:icon="@drawable/ic_action_refresh"
+        android:showAsAction="always"
+        />
+    
+    <item
+        android:id="@+id/action_settings"
+        android:orderInCategory="100"
+        android:showAsAction="never"
+        android:title="@string/action_settings"/>
+
+</menu>
