@@ -4,7 +4,7 @@ package nl.stoux.peer2peerstreaming.objects;
 
 
 
-public class RTPpacket{
+public class RTPpacket implements Comparable<RTPpacket>{
 
   //size of the RTP header:
   static int HEADER_SIZE = 12;
@@ -34,43 +34,53 @@ public class RTPpacket{
   //Constructor of an RTPpacket object from header fields and payload bitstream
   //--------------------------
   public RTPpacket(int PType, int Framenb, int Time, byte[] data, int data_length){
-    //fill by default header fields:
-    Version = 2;
-    Padding = 0;
-    Extension = 0;
-    CC = 0;
-    Marker = 0;
-    Ssrc = 0;
+		//fill by default header fields:
+	    Version = 2;
+	    Padding = 0;
+	    Extension = 0;
+	    CC = 0;
+	    Marker = 0;
+	    Ssrc = 0;
 
-    //fill changing header fields:
-    SequenceNumber = Framenb;
-    TimeStamp = Time;
-    PayloadType = PType;
-    
-    //build the header bistream:
-    //--------------------------
-    header = new byte[HEADER_SIZE];
+	    //fill changing header fields:
+	    SequenceNumber = Framenb;
+	    TimeStamp = Time;
+	    PayloadType = PType;
+	    
+	    //build the header bistream:
+	    //--------------------------
+	    header = new byte[HEADER_SIZE];
 
-    //fill the header array of byte with RTP header fields    
-    header[0] = toByte(Version);
-    header[1] = toByte(Padding);
-    header[2] = toByte(Extension);
-    header[3] = toByte(CC);
-    header[4] = toByte(Marker);
-    header[5] = toByte(PayloadType);
-    header[6] = toByte(SequenceNumber);
-    header[7] = toByte(TimeStamp);
-    header[8] = toByte(Ssrc);
-    //TODO: Other 3 bytes?
- 
+	    //fill the header array of byte with RTP header fields  
+	    header[0] = Integer.valueOf(Version << 6 | Padding << 5 | Extension << 4 | CC).byteValue();
+	    header[1] = Integer.valueOf(Marker << 7 | PayloadType).byteValue();
+	    header[2] = Integer.valueOf(SequenceNumber >> 8).byteValue();
+	    header[3] = Integer.valueOf(SequenceNumber).byteValue();
+	    
+	    /* Manual
+	    header[4] = new Integer(TimeStamp >> 24).byteValue();
+	    header[5] = new Integer(TimeStamp >> 16).byteValue();
+	    header[6] = new Integer(TimeStamp >> 8).byteValue();
+	    header[7] = new Integer(TimeStamp).byteValue();
+	    */
+	    
+	    //For try
+	    for (int i = 3; i >= 0; i--) {
+	    	header[7 - i] = Integer.valueOf(TimeStamp >> (8 * i)).byteValue();
+	    }
+	    
+	    for (int i = 3; i >= 0; i--) {
+	    	header[11 - i] = Integer.valueOf(Ssrc >> (8 * i)).byteValue();
+	    }
+	 
 
-    //fill the payload bitstream:
-    //--------------------------
-    payload_size = data_length;
-    payload = new byte[data_length];
+	    //fill the payload bitstream:
+	    //--------------------------
+	    payload_size = data_length;
+	    payload = new byte[data_length];
 
-    //fill payload array of byte from data (given in parameter of the constructor)
-    payload = data;
+	    //fill payload array of byte from data (given in parameter of the constructor)
+	    payload = data;
 
     // ! Do not forget to uncomment method printheader() below !
     
@@ -202,5 +212,10 @@ public class RTPpacket{
   static byte toByte(int i) {
 	  return new Integer(i).byteValue();
   }
+  
+  	@Override
+	public int compareTo(RTPpacket another) {
+		return Integer.valueOf(getsequencenumber()).compareTo(Integer.valueOf(another.getsequencenumber()));
+	}
 
 }
