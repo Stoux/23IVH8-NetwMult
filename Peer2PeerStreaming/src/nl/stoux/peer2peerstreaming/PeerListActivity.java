@@ -5,16 +5,18 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
+import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
+
+import nl.stoux.peer2peerstreaming.data.DiscoveryServer;
+import nl.stoux.peer2peerstreaming.data.StreamingPeer;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import nl.stoux.peer2peerstreaming.data.DiscoveryServer;
-import nl.stoux.peer2peerstreaming.data.StreamingPeer;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.app.Activity;
@@ -35,6 +37,7 @@ import android.widget.Toast;
 
 public class PeerListActivity extends Activity {
 	
+	public final static String PREFS = "nl.stoux.PeerListActivity.PREFS";
 	public final static String PEER = "nl.stoux.PeerListActivity.PEER";
 
 	//Activity Data
@@ -44,6 +47,8 @@ public class PeerListActivity extends Activity {
 	//RefreshTask
 	private LoadPeerListTask task;
 	
+	private int shortAnimTime;
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -51,6 +56,14 @@ public class PeerListActivity extends Activity {
 		
 		//Set context
 		this.context = this;
+		
+		//Set anim time
+		shortAnimTime = getResources().getInteger(android.R.integer.config_shortAnimTime);
+		
+		//Check discovery server data
+		if (DiscoveryServer.SERVER_IP == null) {
+			DiscoveryServer.loadSettings(context);
+		}
 		
 		//Set adapter
 		ListView peerView = (ListView) findViewById(R.id.peer_listview);
@@ -76,6 +89,15 @@ public class PeerListActivity extends Activity {
 	}
 	
 	@Override
+	protected void onDestroy() {
+		if (task != null) {
+			task.cancel(true);
+			task = null;
+		}
+		super.onDestroy();
+	}
+	
+	@Override
 	protected void onResume() {
 		super.onResume();
 		if (task == null) {
@@ -98,6 +120,10 @@ public class PeerListActivity extends Activity {
 		// as you specify a parent activity in AndroidManifest.xml.
 		int id = item.getItemId();
 		switch(id) {
+		case R.id.action_settings:
+			Intent settingsIntent = new Intent(context, DiscoveryServerActivity.class);
+			startActivity(settingsIntent);
+			break;
 		case R.id.action_new_upload:
 			//=> Start new upload
 			Intent serverIntent = new Intent(context, ServerActivity.class);
@@ -124,11 +150,10 @@ public class PeerListActivity extends Activity {
 	 * @param show
 	 */
 	public void showProgress(final boolean show) {
-		int shortAnimTime = getResources().getInteger(android.R.integer.config_shortAnimTime);
-		
 		//Get views
 		final View loadingView = findViewById(R.id.loading_status);
 		final View listView = findViewById(R.id.peer_list_view_container);
+		final View emptyListView = findViewById(R.id.peer_list_empty_layout);
 		
 		//Show correct view
 		loadingView.setVisibility(View.VISIBLE);
@@ -152,6 +177,29 @@ public class PeerListActivity extends Activity {
 								: View.VISIBLE);
 					}
 				});
+		
+		if (show && emptyListView.getVisibility() == View.VISIBLE) {
+			showEmptyList(false);
+		}
+	}
+	
+	/**
+	 * Show text for an empty list
+	 * @param show
+	 */
+	public void showEmptyList(final boolean show) {
+		final View emptyListView = findViewById(R.id.peer_list_empty_layout);
+						
+		emptyListView.setVisibility(View.VISIBLE);
+		emptyListView.animate().setDuration(shortAnimTime)
+				.alpha(show ? 1 : 0)
+				.setListener(new AnimatorListenerAdapter() {
+					@Override
+					public void onAnimationEnd(Animator animation) {
+						emptyListView.setVisibility(show ? View.VISIBLE
+								: View.GONE);
+					}
+				});
 	}
 	
 	
@@ -161,12 +209,16 @@ public class PeerListActivity extends Activity {
 		protected List<StreamingPeer> doInBackground(Void... arg0) {
 			//Empty list
 			List<StreamingPeer> peers = new ArrayList<>();
-			
+						
 			//Contact server
 			Socket s = null;
 			try {
 				//=> Create connection
-				s = new Socket(DiscoveryServer.SERVER_IP, DiscoveryServer.SERVER_PORT);
+				s = new Socket();
+				s.setSoTimeout(3000); //Timeout after 3 seconds
+				s.connect(new InetSocketAddress(DiscoveryServer.SERVER_IP, DiscoveryServer.SERVER_PORT));
+				
+				//=> Reader & Writer
 				BufferedWriter w = new BufferedWriter(new OutputStreamWriter(s.getOutputStream()));
 				BufferedReader r = new BufferedReader(new InputStreamReader(s.getInputStream()));
 				
@@ -226,6 +278,11 @@ public class PeerListActivity extends Activity {
 			adapter.updateList(result);
 			task = null;
 			showProgress(false);
+			
+			if (result.isEmpty()) {
+				showEmptyList(true);
+			}
+			
 		}
 		
 	}

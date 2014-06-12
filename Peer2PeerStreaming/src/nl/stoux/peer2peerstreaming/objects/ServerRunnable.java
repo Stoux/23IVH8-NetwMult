@@ -198,7 +198,7 @@ public class ServerRunnable implements Runnable {
 		}
 	}
 	
-	private void notifyUI() {
+	public void notifyUI() {
 		if (ServerActivity.currentActivity != null) {
 			ServerActivity.currentActivity.refreshServerThreadStatus();
 		}

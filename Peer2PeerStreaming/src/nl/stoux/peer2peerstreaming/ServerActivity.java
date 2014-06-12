@@ -6,9 +6,14 @@ import java.util.List;
 import nl.stoux.peer2peerstreaming.objects.ServerClient;
 import nl.stoux.peer2peerstreaming.objects.ServerRunnable;
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -16,6 +21,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -83,7 +89,7 @@ public class ServerActivity extends Activity {
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.
-		getMenuInflater().inflate(R.menu.server, menu);
+		getMenuInflater().inflate(R.menu.empty_menu, menu);
 		return true;
 	}
 
@@ -102,8 +108,39 @@ public class ServerActivity extends Activity {
 	//Start/Stop buttons
 	public void onStartButton() {
 		if (serverRunnable == null) {
-			new Thread(serverRunnable = new ServerRunnable("test")).start();
-			refreshServerStatus();
+			final EditText contentEdit = new EditText(context);
+			
+			//Create dialog
+			AlertDialog dialog = new AlertDialog.Builder(context)
+				.setTitle("Beschrijving")
+				.setMessage("Beschrijving van de video")
+				.setView(contentEdit)
+				.setPositiveButton("Start", new DialogInterface.OnClickListener() {
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						String contentText = contentEdit.getText().toString();
+						new Thread(serverRunnable = new ServerRunnable(contentText)).start();
+						refreshServerStatus();
+					}
+				})
+				.setNegativeButton("Annuleren", new DialogInterface.OnClickListener() {
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						dialog.dismiss();
+					}
+				}).show();
+			
+			//Positive button
+			final Button startButton = dialog.getButton(Dialog.BUTTON_POSITIVE);
+			contentEdit.addTextChangedListener(new TextWatcher() {
+				@Override public void onTextChanged(CharSequence s, int start, int before, int count) {}
+				@Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+				
+				@Override
+				public void afterTextChanged(Editable s) {
+					startButton.setClickable(s.length() > 0);
+				}
+			});
 		}
 	}
 	

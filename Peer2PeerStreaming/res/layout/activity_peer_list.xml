@@ -48,6 +48,25 @@
 	        />
 	
 	</LinearLayout>
+	
+	<RelativeLayout
+	    android:id="@+id/peer_list_empty_layout"
+	    android:layout_width="match_parent" 
+	    android:layout_height="match_parent"
+	    android:visibility="gone"
+	    >
+	    
+	    <TextView 
+	        android:id="@+id/peer_list_empty_text"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:textAppearance="?android:attr/textAppearanceMedium"
+	        android:text="Geen servers gevonden!"
+	        android:gravity="center"
+	        android:layout_centerInParent="true"
+	        />
+	    
+	</RelativeLayout>
 
 
 </merge>

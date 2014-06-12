@@ -14,5 +14,6 @@
     <string name="teardown_button">Teardown</string>
     <string name="movie_stream">Movie</string>
     <string name="title_activity_server">Streaming Server</string>
+    <string name="title_activity_discovery_server">DiscoveryServerActivity</string>
 
 </resources>

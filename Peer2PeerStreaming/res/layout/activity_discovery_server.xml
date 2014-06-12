@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" 
+    android:padding="5dp"
+    >
+    
+    <TextView
+        android:id="@+id/settings_ip_adress" 
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="Server IP"
+        />
+    
+    <EditText 
+        android:id="@+id/settings_ip_adress_input"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="192.168.2.45"
+        android:text="192.168.2.45"
+        />
+    
+    <TextView
+        android:id="@+id/settings_port" 
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="Server Port"
+        android:layout_marginTop="10dp"
+        />
+    
+    <EditText 
+        android:id="@+id/settings_port_input"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="34404"
+        android:text="34404"
+        android:inputType="number"
+        android:maxLength="5"
+        />
+    
+    <Button 
+        android:id="@+id/settings_save_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:text="Opslaan"
+        android:layout_marginTop="10dp"
+        />
+
+</LinearLayout>

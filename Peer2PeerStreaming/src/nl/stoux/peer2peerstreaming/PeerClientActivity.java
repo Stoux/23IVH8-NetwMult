@@ -76,7 +76,7 @@ public class PeerClientActivity extends Activity {
 	public boolean onCreateOptionsMenu(Menu menu) {
 
 		// Inflate the menu; this adds items to the action bar if it is present.
-		getMenuInflater().inflate(R.menu.peer_client, menu);
+		getMenuInflater().inflate(R.menu.empty_menu, menu);
 		return true;
 	}
 
@@ -91,22 +91,10 @@ public class PeerClientActivity extends Activity {
 		}
 		return super.onOptionsItemSelected(item);
 	}
-	
-	
-	@Override
-	public void finish() {
-		//Try to close sockets & stop threads
-		try { rtspSocket.close(); } catch (Exception e) {}
-		try { rtpSocket.close(); } catch (Exception e) {}
-		try { udpThread.interrupt(); } catch (Exception e) {}
-		try { tcpThread.interrupt(); } catch (Exception e) {}
-		
-		super.finish();
-	}
-	
+			
 	@Override
 	public void onBackPressed() {
-		finish();
+		stop();
 	}	
 	
 	private void setButtonState(int buttonID, boolean enabled) {
@@ -247,6 +235,23 @@ public class PeerClientActivity extends Activity {
 	 * Client Functions *
 	 ********************
 	 */
+	
+	private void stop() {
+		//Try to close sockets & stop threads
+		try { rtspSocket.close(); } catch (Exception e) {}
+		try { rtpSocket.close(); } catch (Exception e) {}
+		try { udpThread.interrupt(); } catch (Exception e) {}
+		try { tcpThread.interrupt(); } catch (Exception e) {}
+		try { rtpRunnable.timer.cancel(); } catch (Exception e) {}
+		
+		runOnUiThread(new Runnable() {
+			
+			@Override
+			public void run() {
+				finish();
+			}
+		});
+	}
 		
 	/**
 	 * Setup the client
@@ -282,7 +287,7 @@ public class PeerClientActivity extends Activity {
 							Toast.makeText(context, "Kon geen verbinding maken!", Toast.LENGTH_LONG).show();
 						}
 					});
-					finish();
+					stop();
 				}
 								
 				Log.i("StreamingTest", "RTSP Socket setup!");
@@ -353,7 +358,7 @@ public class PeerClientActivity extends Activity {
 						
 						//Full stop
 						setResult(RESULT_OK);
-						finish();
+						stop();
 						break;
 					}
 				}
@@ -379,12 +384,12 @@ public class PeerClientActivity extends Activity {
 					  System.out.println("Exception caught: "+ex);
 					  runOnUiThread(new Runnable() {
 							
-							@Override
-							public void run() {
-								Toast.makeText(context, "En toen was die kapot.", Toast.LENGTH_LONG).show();
-							}
-						  });
-						  finish();
+						@Override
+						public void run() {
+							Toast.makeText(context, "En toen was die kapot.", Toast.LENGTH_LONG).show();
+						}
+					  });
+					  stop();
 			      }
 			  }
 			
@@ -422,7 +427,7 @@ public class PeerClientActivity extends Activity {
 							Toast.makeText(context, "En toen was die kapot.", Toast.LENGTH_LONG).show();
 						}
 					  });
-					  finish();
+					  stop();
 			      }
 				  return(reply_code);
 			  }
@@ -484,7 +489,7 @@ public class PeerClientActivity extends Activity {
 						Toast.makeText(context, "Kon geen verbinding maken!", Toast.LENGTH_LONG).show();
 					}
 				  });
-				  finish();
+				stop();
 			}
 			
 			//init seq number

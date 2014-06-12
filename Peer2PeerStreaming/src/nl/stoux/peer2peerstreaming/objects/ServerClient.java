@@ -152,12 +152,12 @@ public class ServerClient implements Runnable {
 
 				//Update state
 				state = TEARDOWN;
-				updateUI(); //Update the UI for new state
 				Log.i("StreamingServer", "[Session: " + sessionID + "] State: PLAYING");
 			}
 		}
 		//Close client
 		killClient();
+		updateUI(); //Update the UI for new state
 	}
 	
 	
@@ -209,6 +209,7 @@ public class ServerClient implements Runnable {
 	    	//else LastLine will be the SessionId line ... do not check for now.
 	    } catch(Exception ex) {
 	    	System.out.println("Exception caught: "+ex);
+	    	state = FAILED;
 	    }
 	    return(requestType);
 	  }
@@ -225,6 +226,7 @@ public class ServerClient implements Runnable {
 			//System.out.println("RTSP Server - Sent response to Client.");
 		} catch(Exception ex) {
 			System.out.println("Exception caught: "+ex);
+			state = FAILED;
 		}
 	}
 	
@@ -354,17 +356,13 @@ public class ServerClient implements Runnable {
 	}
 	
 	public void killClient() {
-		try {
-			stopTimer();
-			rtpSocket.close();
-			rtspSocket.close();
-		} catch (Exception e) {
-			
-		}
+		try { stopTimer(); } catch (Exception e) {}
+		try { rtpSocket.close(); } catch (Exception e) {}
+		try { rtspSocket.close(); } catch (Exception e) {}
 		
 		synchronized (ServerActivity.clients) {
 			ServerActivity.clients.remove(this);
-		}
+		}		
 	}
 	
 	private void updateUI() {
