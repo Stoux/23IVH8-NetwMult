@@ -91,8 +91,8 @@ public class RequestHandler implements Runnable {
 				JsonArray data = new JsonArray();
 				for (StreamingServer server : servers) {
 					JsonObject sObject = new JsonObject();
-					sObject.add("peer-ip", server.getIP());
-					sObject.add("peer-port", server.getRTSP_port());
+					sObject.add("peer-ip", "84.84.208.93");//server.getIP());
+					sObject.add("peer-port", 80); //server.getRTSP_port());
 					sObject.add("content-description", server.getContentDescription());
 					sObject.add("filename", server.getFilename());
 					data.add(sObject);

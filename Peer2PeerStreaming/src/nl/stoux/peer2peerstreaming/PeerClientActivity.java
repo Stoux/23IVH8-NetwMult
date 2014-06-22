@@ -10,6 +10,7 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.Socket;
 import java.net.SocketException;
+import java.util.ArrayList;
 import java.util.StringTokenizer;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -44,6 +45,10 @@ public class PeerClientActivity extends Activity {
 	//Peer
 	private StreamingPeer peer;
 	
+	//Playout Delay fields
+	private TextView playoutDelayView;
+	private TextView calculatedDelayView;
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -61,6 +66,10 @@ public class PeerClientActivity extends Activity {
 		
 		//Get ImageView for Video
 		videoView = (ImageView) findViewById(R.id.movie_stream);
+		
+		//Get Delay fields
+		playoutDelayView = (TextView) findViewById(R.id.jitter_playout_delay);
+		calculatedDelayView = (TextView) findViewById(R.id.jitter_calculated_delay);
 		
 		//Set buttons
 		setButtonState(R.id.pause_button, false);
@@ -243,6 +252,7 @@ public class PeerClientActivity extends Activity {
 		try { udpThread.interrupt(); } catch (Exception e) {}
 		try { tcpThread.interrupt(); } catch (Exception e) {}
 		try { rtpRunnable.timer.cancel(); } catch (Exception e) {}
+		try { rtpRunnable.playoutTimer.cancel(); } catch (Exception e) {}
 		
 		runOnUiThread(new Runnable() {
 			
@@ -462,7 +472,7 @@ public class PeerClientActivity extends Activity {
 		}).start();
 		
 	}
-	
+		
 	/**
 	 * Class for running RTP thread
 	 */
@@ -471,6 +481,7 @@ public class PeerClientActivity extends Activity {
 		public boolean setup = false;
 		public boolean paused = true;
 		private Timer timer;
+		private Timer playoutTimer;
 		
 		@Override
 		public void run() {
@@ -515,31 +526,64 @@ public class PeerClientActivity extends Activity {
 						//Create RTPPacket from DP
 						RTPpacket rtpPacket = new RTPpacket(recievedPacket.getData(), recievedPacket.getLength());
 						
-						//Get payload
-						final int payloadLength = rtpPacket.getpayload_length();
-						final byte[] payload = new byte[payloadLength];
-						rtpPacket.getpayload(payload);
+						//Check playout
+						calculatePlayoutDelay(rtpPacket);
 						
-						//Post the image
-						runOnUiThread(new Runnable() {
-							@Override
-							public void run() {
-								//Create bitmap from payload
-								Bitmap bmp = BitmapFactory.decodeByteArray(payload, 0, payloadLength);
-								//Set image as current
-								videoView.setImageBitmap(bmp);
-							}
-						});
+						//Add to buffer
+						synchronized (packetBuffer) {
+							packetBuffer.add(rtpPacket);
+						}
 					} catch (InterruptedIOException e) {
 						//Nothing to read
 					} catch (IOException e) {
 						Log.w("StreamingTest", "Exception caught recieving mesage! " + e);
 					}
 				}
-			}, 20, 20);
-			
-			
+			}, 5, 5);
+						
 			setup = true;
+		}
+		
+		public void startPlayoutTimer() {			
+			Log.d("deb", "Current: " + playoutSpeed);
+			
+			playoutTimer = new Timer();
+			playoutTimer.scheduleAtFixedRate(new TimerTask() {
+				
+				@Override
+				public void run() {
+					if (paused) return;
+					
+					RTPpacket rtpPacket = null;
+										
+					//Get buffer
+					synchronized (packetBuffer) {
+						if (packetBuffer.isEmpty()) { //Empty buffer
+							return;
+						}
+						
+						//Get first packet
+						rtpPacket = packetBuffer.get(0);
+						packetBuffer.remove(0);
+					}
+					
+					//Get payload
+					final int payloadLength = rtpPacket.getpayload_length();
+					final byte[] payload = new byte[payloadLength];
+					rtpPacket.getpayload(payload);
+					
+					//Post the image
+					runOnUiThread(new Runnable() {
+						@Override
+						public void run() {
+							//Create bitmap from payload
+							Bitmap bmp = BitmapFactory.decodeByteArray(payload, 0, payloadLength);
+							//Set image as current
+							videoView.setImageBitmap(bmp);
+						}
+					});
+				}	
+			}, currentPlayoutDelay, (playoutSpeed == 0 ? 100 : playoutSpeed));
 		}
 		
 		/**
@@ -556,8 +600,99 @@ public class PeerClientActivity extends Activity {
 		 */
 		public void setPaused(boolean paused) {
 			this.paused = paused;
+			
+			if (paused) {
+				try { 
+					playoutTimer.cancel();
+					previousPacketValue = 0;
+					if (calculatedPlayoutDelay != 0) {
+						currentPlayoutDelay = calculatedPlayoutDelay;
+					}
+				} catch(Exception e) {}
+			} else {
+				startPlayoutTimer();
+				setCurrentPlayoutDelayInUI(currentPlayoutDelay);
+			}
 		}
 		
+	}
+	
+	/*
+	 * Buffer shizzle
+	 */
+	//Buffer statics
+	private final static double K = 0.1;
+	private final static double ALPHA = 0.2;
+	private final static double BETA = 0.5;
+	
+	//Buffer info
+	private long currentPlayoutDelay = 150; //Default to 550ms => 0.55 seconds buffering after playing pause
+	private long previousJitterDelay = 20; //Default to 20ms => Fairly decent jitter standard
+	private long previousAverageDeviation = 20; //Don't even know
+	private long previousPacketReceive = 0; //Previous timestamp when received
+	private int previousPacketValue = 0; //Timestamp in previous packet
+	private long calculatedPlayoutDelay = 0; //Calculated playout delay
+	private int playoutSpeed = 0;
+	
+	//Buffer array
+	private ArrayList<RTPpacket> packetBuffer = new ArrayList<>();
+	
+	public void calculatePlayoutDelay(RTPpacket packet) {
+		long cPacketReceive = System.currentTimeMillis();
+		
+		if (previousPacketValue != 0) {
+			//Calculate time passed
+			long foundDifference = cPacketReceive - previousPacketReceive;
+			
+			//=> Should be difference
+			int shouldBeDifference = packet.gettimestamp() - previousPacketValue;
+			playoutSpeed = shouldBeDifference;
+			
+			//=> Ri - Ti
+			long adiptivePacketDelay = Math.abs(shouldBeDifference - foundDifference);
+			
+			//Calculate jitter delay (di)
+			long cJitterDelay = (long) ((1 - ALPHA) * previousJitterDelay + ALPHA * foundDifference);
+			
+			
+			//Estimate average deviation
+			long Vi = (long) ((1 - BETA) * previousAverageDeviation + BETA * Math.abs(adiptivePacketDelay - cJitterDelay));
+			
+			//Playout delay
+			long playoutTime = (long) (cJitterDelay + (K * Vi));
+			calculatedPlayoutDelay = playoutTime;
+			
+			//=> Set in UI
+			setCalculatedPlayoutDelayInUI(playoutTime);
+			
+			//Set new values
+			previousJitterDelay = cJitterDelay;
+			previousAverageDeviation = Vi;
+		}
+		
+		
+		//Set new values
+		previousPacketValue = packet.gettimestamp();
+		previousPacketReceive = cPacketReceive;		
+	}
+	
+	public void setCurrentPlayoutDelayInUI(final long delay) {
+		runOnUiThread(new Runnable() {
+			
+			@Override
+			public void run() {
+				playoutDelayView.setText("Playout delay: " + delay);
+			}
+		});
+	}
+	
+	public void setCalculatedPlayoutDelayInUI(final long delay) {
+		runOnUiThread(new Runnable() {
+			@Override
+			public void run() {
+				calculatedDelayView.setText("Calculated delay: " + delay);
+			}
+		});
 	}
 
 }

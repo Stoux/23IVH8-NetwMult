@@ -26,6 +26,15 @@
         android:layout_marginTop="5dip"
         />
     
+   	<TextView 
+        android:id="@+id/jitter_calculated_delay"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="Calculated Delay: X"
+        android:gravity="center"
+        android:layout_marginTop="5dip"
+        />
+    
     <ImageView
         android:id="@+id/movie_stream"
         android:layout_width="fill_parent"

@@ -37,6 +37,8 @@ public class ServerClient implements Runnable {
 	private final static String CRLF = "\r\n";
 	private final static int MJPEG_TYPE = 26; //RTP payload type for MJPEG video
 	
+	private final static int PLAYOUT = 100; //Playout speed
+	
 	
 	//Client connection
 	private Socket rtspSocket;
@@ -261,7 +263,7 @@ public class ServerClient implements Runnable {
 					}
 				}
 			}
-		}, 100, 100);
+		}, PLAYOUT, PLAYOUT);
 	}
 	
 	/**
@@ -285,7 +287,7 @@ public class ServerClient implements Runnable {
 	public RTPpacket createFramePacket() {
 		try {
 			int imageLength = video.getnextframe(buffer);
-			RTPpacket packet = new RTPpacket(MJPEG_TYPE, imageNumber, imageNumber * 40 /* Frame Speed */, buffer, imageLength);
+			RTPpacket packet = new RTPpacket(MJPEG_TYPE, imageNumber, imageNumber * PLAYOUT, buffer, imageLength);
 			return packet;
 		} catch (Exception e) {
 			state = FAILED;
